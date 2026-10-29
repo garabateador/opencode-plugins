@@ -352,16 +352,11 @@ export default Plugin.define({
     // ---------- rail construction ----------
 
     /** The ScrollView's real scrolling viewport inside the timeline wrapper. */
-const VIEWPORT_SELECTOR = '[data-scrollable], .scroll-view__viewport'
+    const VIEWPORT_SELECTOR = '[data-scrollable], .scroll-view__viewport'
 
-const findViewport = (scroller: HTMLElement): HTMLElement => {
-  return (
-    scroller.querySelector<HTMLElement>(VIEWPORT_SELECTOR) ??
-    (getComputedStyle(scroller).overflowY.split(" ").some((value) => value === "auto" || value === "scroll")
-      ? scroller
-      : scroller)
-  )
-}
+    const findViewport = (scroller: HTMLElement): HTMLElement => {
+      return scroller.querySelector<HTMLElement>(VIEWPORT_SELECTOR) ?? scroller
+    }
 
 const buildRail = (scroller: HTMLElement): Rail | undefined => {
       // Attach inside the nearest positioned ancestor so the rail never
@@ -835,7 +830,6 @@ const buildRail = (scroller: HTMLElement): Rail | undefined => {
 
     // ---------- polling (session / entries changes, throttled sync) ----------
 
-    let syncCount = 0
     const tick = (): void => {
       ensureRails()
       // Entries follow the session data store; a length or id-set change

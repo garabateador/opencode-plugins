@@ -63,7 +63,7 @@ export default Plugin.define({
       for (const [key, entry] of contextCache) if (now - entry.at >= CONTEXT_TTL_MS) contextCache.delete(key)
     }, 60_000)
 
-    // V2 parity of the V1 note "variant 未注册时静默回退": v2's generation
+    // V2 parity of the V1 note "silent fallback for unregistered variants": v2's generation
     // API hard-fails on unregistered variants, so verify against the model's
     // variant list and drop the variant silently when it is not available.
     const applyVariantGuard = async (
@@ -90,7 +90,7 @@ export default Plugin.define({
       explicit?: { providerID: string; modelID: string; variant?: string },
     ): Promise<{ providerID: string; id: string; variant?: string } | undefined> => {
       // Highest priority: the model the caller selected in its composer/prompt
-      // ("使用对话框所选择的当前模型"). Falls through to the plugin options,
+      // ("the model currently selected in the composer"). Falls through to the plugin options,
       // then to the location default below.
       if (explicit) {
         return applyVariantGuard({

@@ -16,7 +16,7 @@ const client = OpenCode.make({
 console.log("plugins:", (await client.plugin.list({ location: { directory: process.cwd() } })).data.map((p) => ({ id: p.id, state: p.state.status, features: p.features })))
 
 const result = await client.rpc(Optimize).optimize({
-  text: process.env.SMOKE_TEXT ?? "我想在聊天框下面加一个 statusbar，显示当前模型和上下文占用",
+  text: process.env.SMOKE_TEXT ?? "Add a status bar under the chat area that displays the current model and context usage",
   directory: process.cwd(),
 })
 console.log("optimize ->", { language: result.language, contextUsed: result.contextUsed })

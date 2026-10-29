@@ -84,7 +84,6 @@ export default Plugin.define({
 
     const entriesFor = (sessionID: string | undefined) => readEntries(context, sessionID)
 
-
     const openPanel = (sessionID: string | undefined, focus?: string) => {
       if (!sessionID) {
         context.ui.toast.show({ variant: "warning", message: "Open a session first" })

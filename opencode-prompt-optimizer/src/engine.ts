@@ -21,9 +21,9 @@ import type { Language } from "./rpc"
  *   execFileSync git; V2 reads it through the server's ctx.vcs domain)
  */
 
-export const LANG_HINT: Record<Language, string> = {
+const LANG_HINT: Record<Language, string> = {
   en: "Output the optimized prompt in English. No explanation, no preamble, no think tags.",
-  zh: "用中文输出优化后的 prompt. 不要任何解释、前缀或 think 标签.",
+  zh: "Output the optimized prompt in Chinese. No explanation, no preamble, no think tags.",
 }
 
 const STRONG_DOC_FILES = [
@@ -83,7 +83,7 @@ function readTextSafe(path: string, maxBytes: number): string | null {
 /**
  * Fixed-name reads only (package.json + STRONG_DOC_FILES). No directory
  * walking: the plugin never scans the tree, matching the V1 privacy note
- * "只读这些固定文件，不递归扫描项目".
+ * ("read only these fixed files, no recursive scanning of the project").
  */
 export function gatherProjectContext(directory: string, vcs: VcsSnapshot | null): ProjectContext | null {
   const pkgRaw = readTextSafe(join(directory, "package.json"), 1024)
@@ -139,7 +139,7 @@ export function gatherProjectContext(directory: string, vcs: VcsSnapshot | null)
  * The user-facing instruction block, verbatim from V1's buildSystem
  * (only the CWD line now renders the explicit directory).
  */
-export function buildSystem(lang: Language, project: ProjectContext | null, userInput: string, directory: string): string {
+function buildSystem(lang: Language, project: ProjectContext | null, userInput: string, directory: string): string {
   const ctx = project
     ? [
         "[WORKSPACE]",
@@ -170,7 +170,8 @@ export function buildSystem(lang: Language, project: ProjectContext | null, user
 }
 
 /** V1 sent the raw request as the user message with this suffix; generate.text takes one prompt, so the same shape is assembled. */
-export const USER_MESSAGE_SUFFIX = "\n\n（请直接输出优化后的 prompt, 不要任何解释、标记或格式说明）"
+const USER_MESSAGE_SUFFIX =
+  "\n\n(Please output the optimized prompt directly, without any explanation, markers, or formatting notes.)"
 
 export function buildPrompt(input: {
   lang: Language

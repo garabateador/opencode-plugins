@@ -12,5 +12,5 @@
     "lib": ["ES2022"],
     "types": ["node"]
   },
-  "include": ["src/index.ts", "src/engine.ts", "src/rpc.ts", "vite.config.ts", "scripts/**/*.ts"]
+  "include": ["src/index.ts", "src/engine.ts", "src/rpc.ts", "src/errors.ts", "vite.config.ts", "scripts/**/*.ts"]
 }

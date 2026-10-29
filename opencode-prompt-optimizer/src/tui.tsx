@@ -3,6 +3,7 @@ import { TextAttributes } from "@opentui/core"
 import { useTerminalDimensions } from "@opentui/solid"
 import { createEffect, createSignal, onCleanup, Show } from "solid-js"
 import { Plugin } from "@opencode/plugin/tui"
+import { messageOf } from "./errors"
 import { Optimize, type ModelRef, type OptimizeOutput } from "./rpc"
 
 /**
@@ -41,33 +42,6 @@ const TOAST = {
   emptyInput: "Input is empty, nothing to optimize",
 }
 
-// RPC/transport rejections arrive in several shapes (ClientError with .data,
-// nested .cause, plain RpcError body objects). Resolve the human message
-// without ever rendering "[object Object]".
-const messageOf = (error: unknown): string => {
-  if (typeof error === "string") return error
-  const source = (error ?? {}) as Record<string, unknown>
-  const candidates: unknown[] = [
-    (source as { data?: { message?: unknown } }).data,
-    source.cause,
-    (source.cause as { data?: { message?: unknown } } | undefined)?.data,
-  ]
-  for (const candidate of candidates) {
-    const message = (candidate as { message?: unknown } | undefined)?.message
-    if (typeof message === "string" && message.length > 0) return message
-  }
-  if (error instanceof Error && error.message) return error.message
-  const direct = (source as { message?: unknown }).message
-  if (typeof direct === "string" && direct.length > 0) return direct
-  try {
-    const json = JSON.stringify(error)
-    if (json && json !== "undefined") return json.slice(0, 240)
-  } catch {
-    /* fall through */
-  }
-  return String(error)
-}
-
 export default Plugin.define({
   id: "prompt-optimizer.tui",
   setup(context) {
@@ -102,6 +76,8 @@ export default Plugin.define({
      * exist.
      */
     let promptInputCache: { node: unknown } | undefined
+    let probeCount = -1
+    let probeReadback = "n/a"
     const findPromptInput = async (): Promise<any | undefined> => {
       const cached = (promptInputCache?.node ?? undefined) as any
       if (cached && cached?.parent) return cached
@@ -140,9 +116,6 @@ export default Plugin.define({
         return undefined
       }
     }
-
-    let probeCount = -1
-    let probeReadback = "n/a"
 
     /** Read the composer's current content through the same internal channel
      *  as the write side. Returns undefined when the textarea cannot be
@@ -194,7 +167,7 @@ export default Plugin.define({
       setPending((count) => count + 1)
       try {
         const directory = context.location?.directory
-        // Follow the model currently selected in the prompt (可配置的模型).
+        // Follow the model currently selected in the prompt (configurable).
         // While the catalog loads current() is undefined → the server falls
         // back to its options/default.
         let model: ModelRef | undefined
@@ -307,13 +280,6 @@ export default Plugin.define({
       })
     }
 
-    const runWithText = async (raw: string) => {
-      // Delivery (in-place replace / dialog) is fully handled inside
-      // optimize(); the result is returned for callers that only need to
-      // know the run succeeded.
-      await optimize(raw)
-    }
-
     const runCommand = async (input?: string) => {
       const raw = input?.trim()
       if (input !== undefined && input !== null && !raw) {
@@ -346,7 +312,7 @@ export default Plugin.define({
           source = asked.trim()
         }
       }
-      await runWithText(source)
+      await optimize(source)
     }
 
     // Palette + slash command. `arguments: true` keeps the raw text typed
