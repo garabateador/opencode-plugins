@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "opencode-prompt-optimizer",
+  "version": "1.0.3",
+  "description": "One-click prompt optimizer for OpenCode v2 (TUI + Desktop). Expands brief requests into directly-executable task specs.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./rpc": "./src/rpc.ts",
+    "./tui": "./dist/tui.js",
+    "./gui-experimental": "./dist/gui-experimental.cjs"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "bun run scripts/build.ts && vite build",
+    "build:tui": "bun run scripts/build.ts",
+    "build:gui": "vite build",
+    "dev": "bun run scripts/build.ts --watch",
+    "smoke": "bun run smoke.ts",
+    "prepublishOnly": "bun run build",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.tui.json && tsc -p tsconfig.gui.json"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.2.0"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.6.6",
+    "@opentui/solid": ">=0.6.6",
+    "solid-js": ">=1.9.0"
+  },
+  "devDependencies": {
+    "@opencode/theme": "2.2.0",
+    "@opentui/core": "0.7.0",
+    "@opentui/solid": "0.7.0",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^24.0.0",
+    "solid-js": "1.9.12",
+    "typescript": "5.8.2",
+    "vite": "^7.0.0",
+    "vite-plugin-solid": "^2.11.0"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-v2",
+    "plugin",
+    "tui",
+    "desktop",
+    "prompt",
+    "ai"
+  ],
+  "license": "MIT"
+}
